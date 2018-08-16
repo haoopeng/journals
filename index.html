@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<!-- <meta name="viewport" content="width=device-width" /> -->
+<html>
+
+<head>
+<title>journal2vec</title>
+<link rel="stylesheet" type="text/css" href="main.css">
+<script src="d3.v4.min.js" charset="utf-8"></script>
+<script src="d3-tip.min.js"></script>
+<script src="colorcode.js"></script>
+</head>
+
+<body>
+
+<div id="title">A High Dimensional Science Map</div>
+
+<div id="container">
+
+<div id="control">
+  <p class="bio" onclick="toggleColor('circle.bio')">Biology</p>
+  <p class="chem" onclick="toggleColor('circle.chem')">Chemistry</p>
+  <p class="biotech" onclick="toggleColor('circle.biotech')">Biotechnology</p>
+  <p class="diseases" onclick="toggleColor('circle.diseases')">Infectious Diseases</p>
+  <p class="medical" onclick="toggleColor('circle.medical')">Medical Specialities</p>
+  <p class="health" onclick="toggleColor('circle.health')">Health Professionals</p>
+  <p class="brain" onclick="toggleColor('circle.brain')">Brain Research</p>
+  <p class="social" onclick="toggleColor('circle.social')">Social Sciences</p>
+  <p class="humanities" onclick="toggleColor('circle.humanities')">Humanities</p>
+  <p class="eecs" onclick="toggleColor('circle.eecs')">EE &amp; CS</p>
+  <p class="mathphysics" onclick="toggleColor('circle.mathphysics')">Math &amp; Physics</p>
+  <p class="engineering" onclick="toggleColor('circle.engineering')">Engineering</p>
+  <p class="earth" onclick="toggleColor('circle.earth')">Earth Sciences</p>
+  <p class="interdiscipline" onclick="toggleColor('circle.interdiscipline')">Interdiscipline</p>
+  <button id="all" onclick="toggleColor('all')">All Journals</button>
+</div>
+
+<div id="viz">
+</div>
+
+<div id="text">
+  <p>Click above to see each discipline!</p>
+</div>
+<script>
+
+width = 800;
+height = 600;
+var svg = d3.select("#viz").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var margin = 10,
+    radius = 1.8;
+var x = d3.scaleLinear().range([margin, width-margin]);
+var y = d3.scaleLinear().range([height-margin, margin]);
+
+// zooming
+var zm = d3.zoom().scaleExtent([1/2,10]).on("zoom", zoomed);
+svg.append("rect")
+  .attr("width", width)
+  .attr("height", height)
+  .style("fill", "none")
+  .style("pointer-events", "all")
+  .call(zm);
+
+var dots;
+var g = svg.append("g");
+
+d3.csv("jmap.csv", function(error, data) {
+  dots = data;
+
+  // tooltip
+  var tool_tip = d3.tip()
+    .attr("class", "d3-tip")
+    .offset([-8, 0])
+    .html(function(d) {return d.jname; });
+  svg.call(tool_tip);
+
+  // venues as circles
+  g.selectAll("circle")
+    .data(dots, function(d) { return d.jname; })
+    .enter().append("circle")
+    .attr("class", function(d) { return color2class[d.hex_color]; })
+    .attr("r", radius)
+    .attr("cx", function(d) { return x(d.x); })
+    .attr("cy", function(d) { return y(d.y); })
+    .on("mouseover", tool_tip.show)
+    .on("mouseout", tool_tip.hide);
+});
+
+
+d3.selection.prototype.moveToFront = function() {
+  return this.each(function(){
+    this.parentNode.appendChild(this);
+  });
+};
+
+function zoomed() {
+  g.attr("transform", d3.event.transform);
+}
+
+function toggleColor(cls) {
+  if (cls == 'all') {
+    svg.selectAll("circle").style("opacity", 1.0);
+  } else {
+    svg.selectAll("circle").style("opacity", 0.1);
+    var sel = svg.selectAll(cls);
+    sel.moveToFront();
+    sel.style("opacity", 1.0);
+    // var currOpacity = svg.select(cls).style("opacity");
+    // var newOpacity = currOpacity < 0.5 ? 1.0 : 0.1;
+    // svg.selectAll(cls).style("opacity", newOpacity);
+  }
+}
+
+</script>
+
+</div>
+</body>
+</html>
