@@ -1,2 +1,2 @@
-# j2v
-j2v intro
+# journals
+2d visualization of academic journals.
