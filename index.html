@@ -5,6 +5,7 @@
 
 <head>
 <title>journal2vec</title>
+<link rel="shortcut icon" href="">
 <link rel="stylesheet" type="text/css" href="main.css">
 <script src="d3.v4.min.js" charset="utf-8"></script>
 <script src="d3-tip.min.js"></script>
@@ -66,14 +67,14 @@ svg.append("rect")
 var dots;
 var g = svg.append("g");
 
-d3.csv("jmap.csv", function(error, data) {
+d3.csv("jid_2d_projection.csv", function(error, data) {
   dots = data;
 
   // tooltip
   var tool_tip = d3.tip()
     .attr("class", "d3-tip")
     .offset([-8, 0])
-    .html(function(d) {return d.jname; });
+    .html(function(d) { return d.jname + '<br /><br />Distance to its discipline center: ' + d.distance_to_disc_center.toString().slice(0, 4); });
   svg.call(tool_tip);
 
   // venues as circles
